@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
 
 const MyAppointments = () => {
   // Sample data - in a real app, you would fetch this from an API
@@ -75,8 +74,7 @@ const MyAppointments = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6">
-      <Header />
+    <div className="">
       
       <div className="max-w-7xl mx-auto">
         {/* Page Header */}

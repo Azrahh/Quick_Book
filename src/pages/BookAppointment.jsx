@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Header from '../components/Header';
 import Stepper from '../components/Stepper';
 import ServiceCard from '../components/ServiceCard';
 import DatePicker from '../components/DatePicker';
@@ -106,8 +105,7 @@ const BookAppointment = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6">
-      <Header />
+    <>
       
       <div className="max-w-3xl mx-auto">
         <Stepper steps={steps} currentStep={currentStep} />
@@ -145,11 +143,8 @@ const BookAppointment = () => {
           </div>
         )}
 
-        <footer className="mt-12 text-center text-sm text-gray-500">
-          © 2025 QuickBook. All rights reserved.
-        </footer>
       </div>
-    </div>
+    </>
   );
 };
 
