@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import Header from '../components/Header';
-import Stepper from '../components/Stepper';
-import ServiceCard from '../components/ServiceCard';
-import DatePicker from '../components/DatePicker';
-import TimeSlotPicker from '../components/TimeSlot';
-import ConfirmAppointment from '../components/ConfirmAppointment';
+import Stepper from '../../components/Stepper';
+import ServiceCard from '../../components/ServiceCard';
+import DatePicker from '../../components/DatePicker';
+import TimeSlotPicker from '../../components/TimeSlot';
+import ConfirmAppointment from '../../components/ConfirmAppointment';
 
 const BookAppointment = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -106,8 +105,7 @@ const BookAppointment = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen p-6">
-      <Header />
+    <>
       
       <div className="max-w-3xl mx-auto">
         <Stepper steps={steps} currentStep={currentStep} />
@@ -116,7 +114,6 @@ const BookAppointment = () => {
           {renderStepContent()}
         </div>
 
-        {/* Only show these buttons when not on TimeSlot or Confirm steps */}
         {currentStep < 2 && (
           <div className="flex justify-between">
             {currentStep > 0 && (
@@ -145,11 +142,8 @@ const BookAppointment = () => {
           </div>
         )}
 
-        <footer className="mt-12 text-center text-sm text-gray-500">
-          © 2025 QuickBook. All rights reserved.
-        </footer>
       </div>
-    </div>
+    </>
   );
 };
 
