@@ -16,15 +16,15 @@ import MyAppointments from './pages/user/MyAppointments';
 // Admin Pages
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminBookings from './pages/admin/Bookings';
- import AdminRequests from './pages/admin/Requests';
+import AdminRequests from './pages/admin/Requests';
 import ManageSlots from './pages/admin/ManageSlots';
+
 function App() {
   const user = useAuthStore((state) => state.user);
 
   return (
     <Router>
       <Routes>
-
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
@@ -40,11 +40,11 @@ function App() {
 
         {/* Admin Protected Routes */}
         <Route element={<ProtectedRoute roles={['admin']} />}>
-          <Route element={<Layout isAdmin />}>
+          <Route element={<Layout />}>
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
-             <Route path="/admin/bookings" element={<AdminBookings />} /> 
-             <Route path="/admin/requests" element={<AdminRequests />} />
-             <Route path="/admin/manage-slots" element={<ManageSlots />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} /> 
+            <Route path="/admin/requests" element={<AdminRequests />} />
+            <Route path="/admin/manage-slots" element={<ManageSlots />} />
           </Route>
         </Route>
 
