@@ -1,7 +1,7 @@
 // src/components/navigation/ProfileDropdown.jsx
 import { useState, useRef, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import useAuthStore from '../../context/useAuthStore';
+import useAuthStore from '../../store/useAuthStore';
 
 export const ProfileDropdown = ({ mobile = false }) => {
   const [isOpen, setIsOpen] = useState(false);

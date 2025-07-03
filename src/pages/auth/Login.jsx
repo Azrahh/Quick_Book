@@ -1,13 +1,13 @@
 // src/pages/auth/LoginPage.jsx
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import useAuthStore from '../../context/useAuthStore';
+import useAuthStore from '../../store/useAuthStore';
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    userType: 'user',
     rememberMe: false
   });
 
@@ -60,29 +60,24 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
     setIsLoading(true);
     setErrors((prev) => ({ ...prev, general: '' }));
 
     try {
-      const success = login(
-        formData.email,
-        formData.password,
-        formData.userType
-      );
+      const { success, role, message } = login({
+        email: formData.email,
+        password: formData.password
+      });
 
       if (success) {
-        const redirectPath =
-          formData.userType === 'admin'
-            ? '/admin/dashboard'
-            : '/user/dashboard';
+        const redirectPath = role === 'admin' ? '/admin/dashboard' : '/user/dashboard';
         navigate(redirectPath);
       } else {
         setErrors((prev) => ({
           ...prev,
-          general: 'Invalid credentials or incorrect user type selected',
+          general: message || 'Login failed',
         }));
       }
     } catch (error) {
@@ -119,95 +114,51 @@ const LoginPage = () => {
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* Email */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
-                id="email"
                 name="email"
                 type="email"
-                autoComplete="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="admin@quickbook.com or user@quickbook.com"
-                className={`appearance-none block w-full px-3 py-2 border ${errors.email ? 'border-red-300' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-sm text-red-600">{errors.email}</p>}
             </div>
 
-            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <input
-                id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="admin123 or user123"
-                className={`appearance-none block w-full px-3 py-2 border ${errors.password ? 'border-red-300' : 'border-gray-300'} rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-sm text-red-600">{errors.password}</p>}
             </div>
 
-            {/* Role + Remember Me */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <label htmlFor="userType" className="block text-sm font-medium text-gray-700 mr-3">
-                  Login as:
-                </label>
-                <select
-                  id="userType"
-                  name="userType"
-                  value={formData.userType}
-                  onChange={handleChange}
-                  className="mt-1 block pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-
-              <div className="flex items-center">
-                <input
-                  id="rememberMe"
-                  name="rememberMe"
-                  type="checkbox"
-                  checked={formData.rememberMe}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
-                  Remember me
-                </label>
-              </div>
+            <div className="flex items-center">
+              <input
+                id="rememberMe"
+                name="rememberMe"
+                type="checkbox"
+                checked={formData.rememberMe}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+              <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
+                Remember me
+              </label>
             </div>
 
-            {/* Submit */}
             <div>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
               >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Signing in...
-                  </>
-                ) : 'Sign in'}
+                {isLoading ? 'Signing in...' : 'Sign in'}
               </button>
             </div>
           </form>
@@ -217,11 +168,6 @@ const LoginPage = () => {
               Don’t have an account?{' '}
               <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
                 Sign up
-              </Link>
-            </p>
-            <p className="mt-2 text-sm text-gray-600">
-              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                Forgot your password?
               </Link>
             </p>
           </div>

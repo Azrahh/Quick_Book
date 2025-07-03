@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
-import { useBookingsStore } from '../../context/bookingStore';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import useBookingsStore from '../../store/bookingStore';
 
 const Bookings = () => {
   const {
@@ -11,12 +13,12 @@ const Bookings = () => {
     deleteBooking,
     getFilteredBookings
   } = useBookingsStore();
-  
+
   const filteredBookings = useMemo(() => getFilteredBookings(), [
-    getFilteredBookings, 
-    filters.search, 
-    filters.service, 
-    filters.status, 
+    getFilteredBookings,
+    filters.search,
+    filters.service,
+    filters.status,
     filters.date
   ]);
 
@@ -29,9 +31,34 @@ const Bookings = () => {
   ), [filteredBookings, currentPage, itemsPerPage]);
 
   const handleExport = () => {
-    // Export functionality would go here
-    console.log('Exporting bookings:', filteredBookings);
-    alert('Export functionality would be implemented here');
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('Bookings Report', 14, 22);
+
+    const tableColumn = ['User', 'Email', 'Service', 'Date', 'Time', 'Status'];
+    const tableRows = [];
+
+    filteredBookings.forEach((booking) => {
+      const row = [
+        booking.userName,
+        booking.email,
+        booking.service,
+        booking.date,
+        booking.time,
+        booking.status,
+      ];
+      tableRows.push(row);
+    });
+
+    autoTable(doc, {
+      startY: 30,
+      head: [tableColumn],
+      body: tableRows,
+      theme: 'grid',
+      headStyles: { fillColor: [37, 99, 235] }, // Tailwind's blue-600
+    });
+
+    doc.save('bookings-report.pdf');
   };
 
   return (
@@ -45,54 +72,43 @@ const Bookings = () => {
       {/* Filters and Actions */}
       <div className="flex flex-wrap justify-between gap-3 mb-6">
         <div className="flex flex-wrap gap-3 flex-1">
-          <div className="flex-1 min-w-[200px]">
-            <input 
-              type="text" 
-              placeholder="Search bookings..." 
-              value={filters.search}
-              onChange={(e) => setFilter('search', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
-            />
-          </div>
-          
-          <div className="flex-initial">
-            <select 
-              value={filters.service}
-              onChange={(e) => setFilter('service', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded text-sm"
-            >
-              <option>All Services</option>
-              <option>Consultation</option>
-              <option>Treatment</option>
-              <option>Check-up</option>
-              <option>Therapy</option>
-              <option>Screening</option>
-            </select>
-          </div>
-          
-          <div className="flex-initial">
-            <select 
-              value={filters.status}
-              onChange={(e) => setFilter('status', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded text-sm"
-            >
-              <option>All Status</option>
-              <option>Confirmed</option>
-              <option>Cancelled</option>
-            </select>
-          </div>
-          
-          <div className="flex-initial">
-            <input 
-              type="date" 
-              value={filters.date}
-              onChange={(e) => setFilter('date', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded text-sm"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search bookings..."
+            value={filters.search}
+            onChange={(e) => setFilter('search', e.target.value)}
+            className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded text-sm"
+          />
+          <select
+            value={filters.service}
+            onChange={(e) => setFilter('service', e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded text-sm"
+          >
+            <option>All Services</option>
+            <option>Consultation</option>
+            <option>Treatment</option>
+            <option>Check-up</option>
+            <option>Therapy</option>
+            <option>Screening</option>
+          </select>
+          <select
+            value={filters.status}
+            onChange={(e) => setFilter('status', e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded text-sm"
+          >
+            <option>All Status</option>
+            <option>Confirmed</option>
+            <option>Cancelled</option>
+          </select>
+          <input
+            type="date"
+            value={filters.date}
+            onChange={(e) => setFilter('date', e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded text-sm"
+          />
         </div>
 
-        <button 
+        <button
           onClick={handleExport}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded flex items-center gap-2"
         >
@@ -105,7 +121,6 @@ const Bookings = () => {
 
       {/* Bookings Table */}
       <div className="border border-gray-200 rounded-lg overflow-hidden mb-4">
-        {/* Table Header */}
         <div className="grid grid-cols-12 bg-gray-100 p-3 border-b border-gray-200">
           <div className="col-span-3 font-semibold text-gray-700 text-sm">USER</div>
           <div className="col-span-2 font-semibold text-gray-700 text-sm">SERVICE</div>
@@ -115,46 +130,30 @@ const Bookings = () => {
           <div className="col-span-1 font-semibold text-gray-700 text-sm">ACTIONS</div>
         </div>
 
-        {/* Booking Rows */}
         {paginatedBookings.length > 0 ? (
           paginatedBookings.map(booking => (
             <div key={booking.id} className="grid grid-cols-12 p-3 border-b border-gray-200 last:border-b-0 items-center">
-              {/* User */}
               <div className="col-span-3">
                 <div className="font-medium text-gray-800">{booking.userName}</div>
                 <div className="text-gray-500 text-xs">{booking.email}</div>
               </div>
-              
-              {/* Service */}
               <div className="col-span-2 text-gray-700">
                 <div>{booking.service}</div>
                 <div className="text-gray-500 text-xs">{booking.duration}</div>
               </div>
-              
-              {/* Date */}
-              <div className="col-span-2 text-gray-700">
-                {booking.date}
-              </div>
-              
-              {/* Time */}
-              <div className="col-span-2 text-gray-700">
-                {booking.time}
-              </div>
-              
-              {/* Status */}
+              <div className="col-span-2 text-gray-700">{booking.date}</div>
+              <div className="col-span-2 text-gray-700">{booking.time}</div>
               <div className="col-span-2">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  booking.status === 'Confirmed' 
-                    ? 'bg-green-100 text-green-800' 
+                  booking.status === 'Confirmed'
+                    ? 'bg-green-100 text-green-800'
                     : 'bg-red-100 text-red-800'
                 }`}>
                   {booking.status}
                 </span>
               </div>
-              
-              {/* Actions */}
               <div className="col-span-1 flex gap-2">
-                <button 
+                <button
                   onClick={() => console.log('View details for', booking.id)}
                   className="p-1 text-blue-600 hover:text-blue-800"
                   title="View Details"
@@ -164,7 +163,7 @@ const Bookings = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 </button>
-                <button 
+                <button
                   onClick={() => deleteBooking(booking.id)}
                   className="p-1 text-red-600 hover:text-red-800"
                   title="Delete"
@@ -188,28 +187,20 @@ const Bookings = () => {
         <div className="text-gray-600 text-sm">
           Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, filteredBookings.length)} of {filteredBookings.length} results
         </div>
-        
         <div className="flex gap-1">
-          <button 
+          <button
             onClick={() => setPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
             className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
           >
             Previous
           </button>
-          
           {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            let pageNum;
-            if (totalPages <= 5) {
-              pageNum = i + 1;
-            } else if (currentPage <= 3) {
-              pageNum = i + 1;
-            } else if (currentPage >= totalPages - 2) {
-              pageNum = totalPages - 4 + i;
-            } else {
-              pageNum = currentPage - 2 + i;
-            }
-            
+            let pageNum = currentPage <= 3
+              ? i + 1
+              : currentPage >= totalPages - 2
+                ? totalPages - 4 + i
+                : currentPage - 2 + i;
             return (
               <button
                 key={pageNum}
@@ -224,8 +215,7 @@ const Bookings = () => {
               </button>
             );
           })}
-          
-          <button 
+          <button
             onClick={() => setPage(Math.min(totalPages, currentPage + 1))}
             disabled={currentPage === totalPages}
             className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
