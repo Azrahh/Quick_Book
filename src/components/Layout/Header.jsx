@@ -1,8 +1,9 @@
 // src/components/layout/Header.jsx
-import useAuthStore  from '../../context/useAuthStore'; // Fixed import path
+import useAuthStore  from '../../store/useAuthStore'; // Fixed import path
 import { AdminNavLinks } from '../navigation/AdminNavLinks';
 import { UserNavLinks } from '../navigation/UserNavLinks';
 import { ProfileDropdown } from '../navigation/ProfileDropdown'; // Added missing import
+
 
 export const Header = () => {
   const user = useAuthStore((state) => state.user);
@@ -17,6 +18,7 @@ export const Header = () => {
           {user && (
             <div className="flex items-center gap-4">
               <ProfileDropdown />
+              
              
             </div>
           )}

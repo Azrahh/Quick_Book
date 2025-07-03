@@ -21,7 +21,7 @@ export const UserNavLinks = () => {
             isActive ? 'text-blue-600 font-semibold' : 'hover:text-blue-600'
           }
         >
-          Book
+          Book Appointment
         </NavLink>
       </li>
       <li>

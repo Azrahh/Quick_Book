@@ -1,6 +1,6 @@
 // src/routes/ProtectedRoute.jsx
 import { Navigate, Outlet } from 'react-router-dom';
-import useAuthStore from '../context/useAuthStore';
+import useAuthStore from '../store/useAuthStore';
 
 export const ProtectedRoute = ({ roles = ['user', 'admin'], redirectTo = '/login', children }) => {
   const user = useAuthStore((state) => state.user);
